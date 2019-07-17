@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "dev": "parcel test/index.html",
+    "build": "parcel build src/index.js --out-dir dist/"
+  }
+}
