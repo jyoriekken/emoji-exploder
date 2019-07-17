@@ -4,3 +4,5 @@
 * Spawn emojis via method or keyboard shortcut
 * Make page go boom with emojis
 * Make visitors happy
+
+## [Demo](https://emoji-exploder.netlify.com/)
