@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/index.css"],"names":[],"mappings":"AAAA;AACA;AACA;AACA;AACA;AACA","file":"test.e31bb0bc.css","sourceRoot":"../test","sourcesContent":[".emo_explo--emoji {\n  position: absolute;\n  will-change: transform, opacity;\n  transform: translate3d(0, 0, 0);\n}\n"]}

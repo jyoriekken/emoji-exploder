@@ -1,56 +1,125 @@
+import { Engine, Body, Bodies, World } from 'matter-js'
+import randomEmoji from 'random-emoji'
+
+require('./index.css')
+
 class EmojiExploder {
   constructor() {
-    this.inBrowser = !!window
-    this.x = window.innerWidth / 2
-    this.y = window.innerHeight / 2
-    this.defaultEmoji = '🔥'
-    this.emojiLifespan = 2000
+    this.emojis = {}
+    this.defaultEmoji = null
     this.renderSpeed = 1000 / 15
+    this.lifespanTicks = 40
+    this.latestId = 0
+    this.inBrowser = !!window
+
+    this.cursorX = window.innerWidth / 2
+    this.cursorY = window.innerHeight / 2
+
     this.addEvents()
+    this.initMatterJs()
+
+    // prettier-ignore
+    ;(function run() {
+      window.requestAnimationFrame(run.bind(this))
+      Engine.update(this.engine, 1000 / 60)
+      this.tick()
+    }.apply(this))
+  }
+
+  tick() {
+    for (const emojiGuid in this.emojis) {
+      const emojiData = this.emojis[emojiGuid]
+      if (!emojiData) continue
+
+      emojiData.lifespan += 1
+
+      if (emojiData.lifespan > this.lifespanTicks) {
+        emojiData.el.remove()
+        World.remove(this.engine.world, emojiData.physicsBody)
+        delete this.emojis[emojiGuid]
+      } else {
+        emojiData.position.x = emojiData.physicsBody.position.x
+        emojiData.position.y = emojiData.physicsBody.position.y
+        this.renderEmoji(emojiData)
+      }
+    }
+  }
+
+  initMatterJs() {
+    // create an engine
+    this.engine = Engine.create()
+
+    // run the engine
+    Engine.run(this.engine)
+  }
+
+  makeEmojiGuid() {
+    this.latestId++
+    return this.latestId
   }
 
   addEvents() {
-    if (!this.inBrowser) return
     window.addEventListener('pointermove', this.onPointerMove.bind(this))
   }
 
   onPointerMove(e) {
-    this.x = e.pageX
-    this.y = e.pageY
+    this.cursorX = e.pageX
+    this.cursorY = e.pageY
   }
 
-  explode() {
-    if (!this.inBrowser) return
-
+  spawnAtCursor() {
+    const emojiGuid = this.makeEmojiGuid()
     const emojiEle = document.createElement('div')
-    emojiEle.style = `position: absolute; left: ${this.x}px; top: ${this.y}px; opacity: 1`
+
+    // Construct emoji DOM
+    emojiEle.dataset.guid = emojiGuid
+    emojiEle.classList.add('emo_explo--emoji')
     emojiEle.textContent = this.pickEmoji()
-    emojiEle.dataset.drift = (-0.5 + Math.random()) * 4
+
+    // Insert and save ref to emoji
     const emojiRef = document.body.appendChild(emojiEle)
+    const emojiData = {
+      el: emojiRef,
+      physicsBody: null,
+      lifespan: 0,
+      scale: 1,
+      position: {
+        x: this.cursorX,
+        y: this.cursorY
+      },
+      drift: (-0.5 + Math.random()) * 4
+    }
 
-    // Animate emoji
-    this.animateEmoji(emojiRef)
+    // Add entry to physics simulation
+    const newBody = Bodies.circle(emojiData.position.x, emojiData.position.y, 15)
+    newBody.slop = 1
+    Body.applyForce(
+      newBody,
+      { x: 0, y: 0 },
+      { x: Math.random() * 0.005, y: Math.random() * -0.005 }
+      // { x: Math.random() * 0.0001, y: Math.random() * -0.00015 }
+    )
+    World.add(this.engine.world, newBody)
+    emojiData.physicsBody = newBody
 
-    // Expire emoji after lifespan
-    setTimeout(this.expireEmoji.bind(this, emojiRef), this.emojiLifespan)
+    // Track emoji in "db"
+    this.emojis[emojiGuid] = emojiData
   }
 
-  animateEmoji(emoji) {
-    if (!emoji) return
-
-    setInterval(() => {
-      emoji.style.top = `${parseInt(emoji.style.top) + 5}px`
-      emoji.style.left = `${parseInt(emoji.style.left) + parseInt(emoji.dataset.drift)}px`
-      emoji.style.opacity = `${emoji.style.opacity * 0.98}`
-    }, this.renderSpeed)
+  renderEmoji(emojiData) {
+    emojiData.el.style.transform = this.buildEmojiTransform(emojiData)
   }
 
-  expireEmoji(emoji) {
-    document.body.removeChild(emoji)
+  buildEmojiTransform(emojiData) {
+    return `
+      translateX(${emojiData.position.x}px)
+      translateY(${emojiData.position.y}px)
+      scale(${1 - emojiData.lifespan / this.lifespanTicks})
+    `
   }
 
   pickEmoji() {
-    return this.defaultEmoji
+    return this.defaultEmoji || randomEmoji.random({ count: 1 })[0].character
   }
 }
 

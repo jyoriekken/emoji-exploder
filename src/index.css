@@ -1,0 +1,5 @@
+.emo_explo--emoji {
+  position: absolute;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}

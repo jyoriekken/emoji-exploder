@@ -6,7 +6,12 @@
     <script src="./index.js"></script>
     <script>
       window.exploder = new window.EmojiExploder()
-      setInterval(() => window.exploder.explode(), 1000 / 15)
+      ;(function run() {
+        setTimeout(() => {
+          window.requestAnimationFrame(run)
+          window.exploder.spawnAtCursor()
+        }, 1000 / 60)
+      })()
     </script>
   </body>
 </html>
