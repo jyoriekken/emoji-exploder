@@ -1,6 +1,10 @@
 {
   "scripts": {
     "dev": "parcel test/index.html",
-    "build": "parcel build src/index.js --out-dir dist/"
+    "build": "parcel build src/index.js --out-dir dist/",
+    "build-test": "parcel build test/index.html --out-dir test_built/"
+  },
+  "devDependencies": {
+    "cssnano": "^4.1.10"
   }
 }
