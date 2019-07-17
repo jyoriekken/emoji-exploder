@@ -5,6 +5,7 @@
     "build-test": "parcel build test/index.html --out-dir test_built/"
   },
   "devDependencies": {
+    "parcel": "^1.12.3",
     "cssnano": "^4.1.10"
   }
 }
