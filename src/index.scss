@@ -1,0 +1,19 @@
+.emo_explo--emoji {
+  pointer-events: none;
+  position: fixed;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1em;
+  height: 1em;
+
+  // padding: 0.5em;
+  // background-color: rgba(255, 255, 255, 0.7);
+  // border-radius: 50%;
+
+  &::selection {
+    background-color: transparent;
+  }
+}

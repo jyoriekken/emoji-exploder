@@ -6,12 +6,15 @@
     <script src="./index.js"></script>
     <script>
       window.exploder = new window.EmojiExploder()
-      ;(function run() {
-        setTimeout(() => {
-          window.requestAnimationFrame(run)
-          window.exploder.spawnAtCursor()
-        }, 1000 / 60)
-      })()
+      window.addEventListener('pointerdown', (e) => {
+        window.exploder.explodeAtCursor()
+      })
+      // ;(function run() {
+      //   setTimeout(() => {
+      //     window.requestAnimationFrame(run)
+      //     window.exploder.spawnAtCursor()
+      //   }, 1000 / 60)
+      // })()
     </script>
   </body>
 </html>

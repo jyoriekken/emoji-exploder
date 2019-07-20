@@ -1,12 +1,13 @@
 {
   "scripts": {
-    "dev": "parcel test/index.html",
+    "dev": "parcel serve test/index.html --out-dir tmp/",
     "build": "parcel build src/index.js --out-dir dist/",
     "build-test": "parcel build test/index.html --out-dir test_built/"
   },
   "devDependencies": {
     "cssnano": "^4.1.10",
-    "parcel": "^1.12.3"
+    "parcel": "^1.12.3",
+    "sass": "^1.22.7"
   },
   "dependencies": {
     "matter-js": "^0.14.2",

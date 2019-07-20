@@ -1,3 +1,4 @@
 .cache
 test_built
 node_modules
+tmp

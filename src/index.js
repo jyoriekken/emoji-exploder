@@ -1,17 +1,23 @@
 import { Engine, Body, Bodies, World } from 'matter-js'
 import randomEmoji from 'random-emoji'
 
-require('./index.css')
+require('./index.scss')
 
 class EmojiExploder {
   constructor() {
     this.emojis = {}
     this.defaultEmoji = null
     this.renderSpeed = 1000 / 15
-    this.lifespanTicks = 40
-    this.latestId = 0
-    this.inBrowser = !!window
 
+    this.explosionDensity = 75
+    this.explosionForce = 0.08
+    this.emojiLifespan = 80
+    this.emojiScale = 2
+    this.emojiBodySize = 25
+    this.emojiBodyOverlap = 2.5
+    this.worldGravity = { x: 0.0, y: 0.0 }
+
+    this.latestId = 0
     this.cursorX = window.innerWidth / 2
     this.cursorY = window.innerHeight / 2
 
@@ -33,9 +39,9 @@ class EmojiExploder {
 
       emojiData.lifespan += 1
 
-      if (emojiData.lifespan > this.lifespanTicks) {
-        emojiData.el.remove()
+      if (emojiData.lifespan > this.emojiLifespan) {
         World.remove(this.engine.world, emojiData.physicsBody)
+        emojiData.el.remove()
         delete this.emojis[emojiGuid]
       } else {
         emojiData.position.x = emojiData.physicsBody.position.x
@@ -48,6 +54,7 @@ class EmojiExploder {
   initMatterJs() {
     // create an engine
     this.engine = Engine.create()
+    this.engine.world.gravity = this.worldGravity
 
     // run the engine
     Engine.run(this.engine)
@@ -67,7 +74,24 @@ class EmojiExploder {
     this.cursorY = e.pageY
   }
 
-  spawnAtCursor() {
+  explodeAtCursor() {
+    const cursorPosition = {
+      x: this.cursorX,
+      y: this.cursorY
+    }
+    const explosionLoop = setInterval(() => {
+      this.spawnAtCursor({
+        x: cursorPosition.x + (-0.5 + Math.random()) * 10,
+        y: cursorPosition.y + (-0.5 + Math.random()) * 10
+      })
+    }, this.renderSpeed / 8)
+
+    setTimeout(() => {
+      clearTimeout(explosionLoop)
+    }, this.explosionDensity)
+  }
+
+  spawnAtCursor(cursorPosition = { x: 0, y: 0 }) {
     const emojiGuid = this.makeEmojiGuid()
     const emojiEle = document.createElement('div')
 
@@ -84,37 +108,47 @@ class EmojiExploder {
       lifespan: 0,
       scale: 1,
       position: {
-        x: this.cursorX,
-        y: this.cursorY
-      },
-      drift: (-0.5 + Math.random()) * 4
+        x: cursorPosition.x,
+        y: cursorPosition.y
+      }
     }
 
     // Add entry to physics simulation
-    const newBody = Bodies.circle(emojiData.position.x, emojiData.position.y, 15)
-    newBody.slop = 1
+    const newBody = Bodies.circle(emojiData.position.x, emojiData.position.y, this.emojiBodySize)
+    const randForceX = -0.5 + Math.random()
+    const randForceY = -0.5 + Math.random()
+
+    // Allow bodies to pass into one another
+    newBody.slop = this.emojiBodyOverlap
+
+    // Send em flying
     Body.applyForce(
       newBody,
-      { x: 0, y: 0 },
-      { x: Math.random() * 0.005, y: Math.random() * -0.005 }
-      // { x: Math.random() * 0.0001, y: Math.random() * -0.00015 }
+      { x: cursorPosition.x, y: cursorPosition.y },
+      {
+        x: randForceX * this.explosionForce,
+        y: randForceY * this.explosionForce
+      }
     )
-    World.add(this.engine.world, newBody)
-    emojiData.physicsBody = newBody
 
-    // Track emoji in "db"
+    // Track em
+    World.add(this.engine.world, newBody)
+
+    // Keep refs
+    emojiData.physicsBody = newBody
     this.emojis[emojiGuid] = emojiData
   }
 
   renderEmoji(emojiData) {
     emojiData.el.style.transform = this.buildEmojiTransform(emojiData)
+    emojiData.el.style.opacity = 1 - emojiData.lifespan / this.emojiLifespan
   }
 
   buildEmojiTransform(emojiData) {
     return `
       translateX(${emojiData.position.x}px)
       translateY(${emojiData.position.y}px)
-      scale(${1 - emojiData.lifespan / this.lifespanTicks})
+      scale(${this.emojiScale - emojiData.lifespan / this.emojiLifespan})
     `
   }
 
