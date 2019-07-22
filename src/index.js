@@ -9,9 +9,9 @@ class EmojiExploder {
     this.defaultEmoji = null
     this.renderSpeed = 1000 / 15
 
-    this.explosionDensity = 75
-    this.explosionForce = 0.08
-    this.emojiLifespan = 80
+    this.explosionDensity = 15
+    this.explosionForce = 0.05
+    this.emojiLifespan = 50
     this.emojiScale = 2
     this.emojiBodySize = 25
     this.emojiBodyOverlap = 2.5
@@ -74,17 +74,33 @@ class EmojiExploder {
     this.cursorY = e.pageY
   }
 
+  explodeAtElement(element) {
+    const elementRect = element.getClientRects()[0]
+
+    const explosionLoop = setInterval(() => {
+      this.spawnAtCursor({
+        x: elementRect.x + elementRect.width * Math.random(),
+        y: elementRect.y + elementRect.height * Math.random()
+      })
+    })
+
+    setTimeout(() => {
+      clearTimeout(explosionLoop)
+    }, this.explosionDensity)
+  }
+
   explodeAtCursor() {
     const cursorPosition = {
       x: this.cursorX,
       y: this.cursorY
     }
+
     const explosionLoop = setInterval(() => {
       this.spawnAtCursor({
         x: cursorPosition.x + (-0.5 + Math.random()) * 10,
         y: cursorPosition.y + (-0.5 + Math.random()) * 10
       })
-    }, this.renderSpeed / 8)
+    })
 
     setTimeout(() => {
       clearTimeout(explosionLoop)

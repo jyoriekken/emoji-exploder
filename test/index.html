@@ -1,14 +1,102 @@
 <html>
   <head>
     <link rel="stylesheet" href="./index.css" />
+    <style>
+      header {
+        margin-bottom: 50px;
+      }
+      hr {
+        margin-bottom: 50px;
+      }
+      .target-area {
+        height: calc(128px * 2);
+      }
+      .target {
+        background-color: hotpink;
+        border-radius: 50%;
+        width: 128px;
+        height: 128px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 60px;
+      }
+      .target-low {
+        position: relative;
+        transform: translateY(100%);
+      }
+      #explodeButton {
+        width: 100%;
+        height: 256px;
+      }
+    </style>
   </head>
   <body>
+    <header>
+      <h1>emoji-exploder tests</h1>
+    </header>
+
+    <p>1. Click anywhere in the document to explode at cursor.</p>
+    <hr />
+
+    <p>2. Click this button to explode on DOM element.</p>
+    <button id="explodeButton">Explode on Element</button>
+    <hr />
+
+    <p>
+      3. Press <code>1</code> thru <code>4</code> on your keyboard (desktop only) to explode on
+      targets.
+    </p>
+    <div class="target-area">
+      <div class="target" id="target1">1</div>
+      <div class="target target-low" id="target2">2</div>
+      <div class="target" id="target3">3</div>
+      <div class="target target-low" id="target4">4</div>
+    </div>
+    <hr />
+
     <script src="./index.js"></script>
     <script>
+      // Setup exploder for use
       window.exploder = new window.EmojiExploder()
-      window.addEventListener('pointerdown', (e) => {
+
+      // Explode on pointer press
+      // TODO: Test on mobile devices
+      // TODO: Possibly add "explodeWhileTouching" method
+      window.addEventListener('pointerdown', e => {
+        // Prevent double explosion on button click
+        if (e.target == explodeButton) {
+          return
+        }
         window.exploder.explodeAtCursor()
       })
+
+      // Explode on DOM element click
+      const explodeButton = document.getElementById('explodeButton')
+      explodeButton.addEventListener('pointerdown', e => {
+        window.exploder.explodeAtElement(e.currentTarget)
+      })
+
+      // Explode on DOM element with keypress
+      const key1 = document.getElementById('target1')
+      const key2 = document.getElementById('target2')
+      const key3 = document.getElementById('target3')
+      const key4 = document.getElementById('target4')
+      document.addEventListener('keydown', e => {
+        if (e.key == '1') {
+          window.exploder.explodeAtElement(key1)
+        }
+        if (e.key == '2') {
+          window.exploder.explodeAtElement(key2)
+        }
+        if (e.key == '3') {
+          window.exploder.explodeAtElement(key3)
+        }
+        if (e.key == '4') {
+          window.exploder.explodeAtElement(key4)
+        }
+      })
+
       // ;(function run() {
       //   setTimeout(() => {
       //     window.requestAnimationFrame(run)

@@ -1,8 +1,12 @@
 # emoji-exploder 🤯️
 
-* Spawn emojis at cursor or at DOM element
-* Spawn emojis via method or keyboard shortcut
-* Make page go boom with emojis
-* Make visitors happy
+- 🌋 Make page go boom with emojis
+- ➣ Spawn emojis at cursor or at DOM element
+- 😍 Make visitors happy
+- ⌨ Spawn emojis via method or keyboard shortcut
 
 ## [Demo](https://emoji-exploder.netlify.com/)
+
+## TODO
+
+- ☐ Unique settings per explosion
