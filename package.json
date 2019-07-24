@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "parcel serve test/index.html --out-dir tmp/",
-    "build": "parcel build src/index.js --out-dir dist/",
+    "build": "parcel build src/index.js --out-dir dist/ --global EmojiExploder",
     "build-test": "parcel build test/index.html --out-dir test_built/"
   },
   "devDependencies": {
