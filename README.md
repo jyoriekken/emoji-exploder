@@ -9,4 +9,5 @@
 
 ## TODO
 
-- ☐ Unique settings per explosion
+- ☐ Add support to constrain exploder collisions to include or exclude the areas of given element(s)
+- ☐ Fix iOS mobile support. Not currently working
