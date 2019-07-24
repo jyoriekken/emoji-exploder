@@ -1,2 +1,2 @@
-.emo_explo--emoji{position:absolute;will-change:transform,opacity;transform:translateZ(0);background-color:hsla(0,0%,100%,.2);border-radius:50%;display:flex;justify-content:center;align-items:center;width:2em;height:2em;padding:1em}
+.emo_explo--emoji{position:fixed;top:0;left:0;display:flex;justify-content:center;align-items:center;width:1em;height:1em;will-change:transform,opacity;transform:translateZ(0);pointer-events:none}.emo_explo--emoji::selection{background-color:transparent}
 /*# sourceMappingURL=/index.css.map */

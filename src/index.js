@@ -6,7 +6,8 @@ require('./index.scss')
 class EmojiExploder {
   constructor() {
     this.emojis = {}
-    this.defaultEmoji = null
+    this.emoji = null
+    this.elementHost = null
     this.renderSpeed = 1000 / 15
 
     this.explosionDensity = 15
@@ -67,6 +68,12 @@ class EmojiExploder {
 
   addEvents() {
     window.addEventListener('pointermove', this.onPointerMove.bind(this))
+    window.addEventListener('touchstart', this.onTouchStart.bind(this))
+  }
+
+  onTouchStart(e) {
+    this.cursorX = e.touches[0].pageX
+    this.cursorY = e.touches[0].pageY
   }
 
   onPointerMove(e) {
@@ -74,8 +81,29 @@ class EmojiExploder {
     this.cursorY = e.pageY
   }
 
-  explodeAtElement(element) {
+  // TODO: Build four walls to contain element, though this will also need to update
+  // on resize / scroll to stay accurate. Not the cleanest, probably not worth the complexity
+  constrainToElement(element) {
+    return
     const elementRect = element.getClientRects()[0]
+    this.elementHost = {
+      el: element,
+      rect: elementRect
+    }
+    this.engine.world.bounds = {
+      min: { x: elementRect.x, y: elementRect.y },
+      max: { x: elementRect.x + elementRect.width, y: elementRect.y + elementRect.height }
+    }
+  }
+
+  explodeAtElement(element) {
+    let elementRect
+    if (this.elementHost) {
+      element = element || this.elementHost.el
+      elementRect = this.elementHost.rect
+    } else {
+      elementRect = element.getClientRects()[0]
+    }
 
     const explosionLoop = setInterval(() => {
       this.spawnAtCursor({
@@ -90,21 +118,25 @@ class EmojiExploder {
   }
 
   explodeAtCursor() {
-    const cursorPosition = {
-      x: this.cursorX,
-      y: this.cursorY
-    }
-
-    const explosionLoop = setInterval(() => {
-      this.spawnAtCursor({
-        x: cursorPosition.x + (-0.5 + Math.random()) * 10,
-        y: cursorPosition.y + (-0.5 + Math.random()) * 10
-      })
-    })
-
+    // HACK:
+    // Wait until next tick to allow for touch handlers to execute & capture correct cursor position
     setTimeout(() => {
-      clearTimeout(explosionLoop)
-    }, this.explosionDensity)
+      const cursorPosition = {
+        x: this.cursorX,
+        y: this.cursorY
+      }
+
+      const explosionLoop = setInterval(() => {
+        this.spawnAtCursor({
+          x: cursorPosition.x + (-0.5 + Math.random()) * 10,
+          y: cursorPosition.y + (-0.5 + Math.random()) * 10
+        })
+      })
+
+      setTimeout(() => {
+        clearTimeout(explosionLoop)
+      }, this.explosionDensity)
+    }, 1)
   }
 
   spawnAtCursor(cursorPosition = { x: 0, y: 0 }) {
@@ -169,7 +201,7 @@ class EmojiExploder {
   }
 
   pickEmoji() {
-    return this.defaultEmoji || randomEmoji.random({ count: 1 })[0].character
+    return this.emoji || randomEmoji.random({ count: 1 })[0].character
   }
 }
 

@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="./index.css" />
     <style>
       header {
@@ -73,8 +74,10 @@
 
       // Explode on DOM element click
       const explodeButton = document.getElementById('explodeButton')
+      window.elementExploder = new window.EmojiExploder()
+      window.elementExploder.constrainToElement(explodeButton)
       explodeButton.addEventListener('pointerdown', e => {
-        window.exploder.explodeAtElement(e.currentTarget)
+        window.elementExploder.explodeAtElement(e.currentTarget)
       })
 
       // Explode on DOM element with keypress
@@ -96,13 +99,6 @@
           window.exploder.explodeAtElement(key4)
         }
       })
-
-      // ;(function run() {
-      //   setTimeout(() => {
-      //     window.requestAnimationFrame(run)
-      //     window.exploder.spawnAtCursor()
-      //   }, 1000 / 60)
-      // })()
     </script>
   </body>
 </html>
